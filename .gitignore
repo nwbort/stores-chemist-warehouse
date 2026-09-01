@@ -1,0 +1,10 @@
+# Only stores.json is tracked. Anything fetched on the way there is a working
+# file - though scrape.py holds the sweep in memory and writes nothing else,
+# so in practice there is little for this to catch.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+*.html
+*.xml

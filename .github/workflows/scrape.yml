@@ -1,0 +1,73 @@
+# Two cadences, because the data has two tiers (PRINCIPLES.md section 4).
+#
+# The API only answers "what is within 26 km of this point", so a complete list
+# means covering the country in overlapping circles - about 7,700 requests and
+# a quarter of an hour. That is far too much to run at a retailer nightly for
+# data that changes a few times a month, so it runs weekly. The daily run
+# sweeps only the neighbourhood of the stores already in stores.json, which is
+# a few hundred requests and catches everything except a store opening more
+# than ~26 km from any existing one. See the docstring in scrape.py.
+
+name: Scrape
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      sweep:
+        description: Which sweep to run
+        type: choice
+        options: [full, targeted]
+        default: full
+  schedule:
+  # Daily targeted sweep at 2:47 PM UTC
+  - cron: '47 14 * * *'
+  # Full national sweep, Sundays at 3:09 PM UTC
+  - cron: '9 15 * * 0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    # The full sweep takes ~15 minutes; the ceiling is here so a wedged run
+    # cannot stack up behind the concurrency group.
+    timeout-minutes: 45
+    if: ${{ !github.event.repository.is_template }}
+    steps:
+    - uses: actions/checkout@v4
+
+    # No setup-python step and no requirements.txt: scrape.py is standard
+    # library only, and ubuntu-latest already ships a new enough Python.
+
+    - name: Run the scraper
+      env:
+        # Cron picks the mode; a manual run chooses, and a push gets the cheap
+        # one so that iterating on the scraper does not mean 7,700 requests.
+        SWEEP: >-
+          ${{ github.event_name == 'schedule'
+              && (github.event.schedule == '9 15 * * 0' && 'full' || 'targeted')
+              || github.event_name == 'workflow_dispatch'
+              && inputs.sweep
+              || 'targeted' }}
+      run: ./scrape.sh
+
+    # Commit only when the data actually changed - `|| exit 0` handles the
+    # no-op case, which is most days. stores.json carries no timestamp or run
+    # id, so this guard does what it looks like it does.
+    - name: Commit and push
+      env:
+        OUTPUT: stores.json
+      run: |-
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add $OUTPUT
+        timestamp=$(date -u)
+        git commit -m "Update store data: ${timestamp}" || exit 0
+        git pull --rebase
+        git push
