@@ -54,7 +54,7 @@ There are two sweeps:
 
 | | Points | Local | On a rate-limited runner | Used for |
 | --- | --- | --- | --- | --- |
-| `--daily` | ~1,000 | ~1.5 min | 10–25 min | The scheduled run |
+| `--daily` | ~1,000 | ~1.5 min | ~20 min | The scheduled run |
 | `--full` | 7,738 | ~12 min | hours | Bootstrapping and verification |
 
 `--daily` is the union of two things. It re-checks every store already in
@@ -91,9 +91,13 @@ at 8 workers without a single 429, and a deliberate 600-request burst at 40
 workers could not provoke one.
 
 **From GitHub-hosted runners it is throttled hard**, and the daily sweep takes
-10–25 minutes instead of 90 seconds. Measured over several runs: 15–49
-rate-limit responses, settling around 0.7–0.9 requests/second, but completing
-and returning the same 564 stores as a local sweep.
+around 20 minutes instead of 90 seconds. Measured across four completed runs:
+15–90 rate-limit responses, settling at a remarkably consistent 0.7–0.9
+requests/second, but finishing every time and returning the same 564 stores as
+a local sweep. The last full-size run was 997 points in 23m18s with 90
+rate-limit responses — against a 60-minute job timeout, so there is headroom,
+and if it ever runs out the job fails loudly rather than committing a partial
+list.
 
 One earlier run was refused outright — *every* request 429'd, including at one
 request every two seconds, with nothing getting through in 99 seconds. That was
