@@ -1,0 +1,71 @@
+# One job, once a day.
+#
+# The API only answers "what is within 26 km of this point", so a complete list
+# means covering the country in overlapping circles - 7,738 requests. That is
+# 12 minutes from an ordinary connection but hours from a rate-limited runner,
+# and far more than this source should be asked for nightly either way. So the
+# daily run re-checks every store already on file (which keeps the output a
+# complete list) and sweeps one fourteenth of the discovery lattice, rotating
+# by date. See the docstring in scrape.py.
+
+name: Scrape
+
+# No `on: push`. The source is rate-sensitive enough that a scrape per commit
+# is a bad trade (PRINCIPLES.md section 4), and the offline checks that guard
+# the tricky parts run locally before every scrape anyway.
+on:
+  workflow_dispatch:
+    inputs:
+      sweep:
+        description: Which sweep to run
+        type: choice
+        options: [daily, full]
+        default: daily
+  schedule:
+  # Daily at 2:47 PM UTC
+  - cron: '47 14 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    # A daily sweep is ~1,000 points: under a minute locally, but 10-25 minutes
+    # from a rate-limited runner, since it pauses when told to. The ceiling is
+    # generous for that, and is here so a wedged run cannot stack up behind the
+    # concurrency group.
+    timeout-minutes: 60
+    if: ${{ !github.event.repository.is_template }}
+    steps:
+    - uses: actions/checkout@v4
+
+    # No setup-python step and no requirements.txt: scrape.py is standard
+    # library only, and ubuntu-latest already ships a new enough Python.
+
+    - name: Run the scraper
+      env:
+        # The schedule always runs the daily cadence; a manual run may ask for
+        # a full sweep instead, which is really a local/bootstrap operation.
+        SWEEP: >-
+          ${{ github.event_name == 'workflow_dispatch' && inputs.sweep || 'daily' }}
+      run: ./scrape.sh
+
+    # Commit only when the data actually changed - `|| exit 0` handles the
+    # no-op case, which is most days. stores.json carries no timestamp or run
+    # id, so this guard does what it looks like it does.
+    - name: Commit and push
+      env:
+        OUTPUT: stores.json
+      run: |-
+        git config user.name "Automated"
+        git config user.email "actions@users.noreply.github.com"
+        git add $OUTPUT
+        timestamp=$(date -u)
+        git commit -m "Update store data: ${timestamp}" || exit 0
+        git pull --rebase
+        git push
