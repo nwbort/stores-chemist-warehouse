@@ -393,9 +393,13 @@ class Throttle:
             self._interval = min(MAX_INTERVAL_S, self._interval * BACKOFF_FACTOR)
             self.slowest_interval = max(self.slowest_interval, self._interval)
             # Our own escalating backoff, jittered so the pool does not resume
-            # in lockstep.
+            # in lockstep. The exponent counts failures *since the last
+            # success*, not for the lifetime of the run: escalation should
+            # reflect the pressure right now. Keyed to the lifetime count, an
+            # isolated 429 late in a healthy sweep cost a two-minute pause,
+            # which is where nearly all of a 9-minute CI run went.
             backoff = min(MAX_PAUSE_S,
-                          PAUSE_BASE_S * 2 ** min(self.penalties - 1, 4))
+                          PAUSE_BASE_S * 2 ** min(self.since_success - 1, 4))
             pause = backoff * (0.5 + random.random())
             # Retry-After is a floor, never a replacement. Cloudflare answers
             # a blocked IP with a Retry-After that parses as zero, and an

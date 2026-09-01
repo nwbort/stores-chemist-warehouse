@@ -13,9 +13,11 @@ quick: the pacing constants are shrunk to keep the whole file well under a
 second, which is why they are set per-section rather than once at the top.
 """
 
+import contextlib
 import datetime
 import email.message
 import email.utils
+import io
 import os
 import sys
 import threading
@@ -134,7 +136,8 @@ def flaky(lat, lon, offset, throttle=None):
 
 
 scrape.request_page = flaky
-result = scrape.fetch_point(-33.87, 151.21, scrape.Throttle(0.0))
+with contextlib.redirect_stderr(io.StringIO()):
+    result = scrape.fetch_point(-33.87, 151.21, scrape.Throttle(0.0))
 check(len(result) == 1 and calls["n"] == 4,
       f"three 429s then success: recovered after {calls['n']} calls")
 
@@ -147,7 +150,8 @@ def always_limited(lat, lon, offset, throttle=None):
 
 scrape.request_page = always_limited
 try:
-    scrape.fetch_point(-33.87, 151.21, scrape.Throttle(0.0))
+    with contextlib.redirect_stderr(io.StringIO()):
+        scrape.fetch_point(-33.87, 151.21, scrape.Throttle(0.0))
     check(False, "persistent 429 raises FetchError")
 except scrape.FetchError as exc:
     check("rate limited" in str(exc) and "shared IP" in str(exc),
@@ -179,13 +183,31 @@ scrape.RATE_LIMIT_ATTEMPTS = 10 ** 6
 scrape.request_page = always_limited
 began = time.monotonic()
 try:
-    scrape.fetch_point(-33.87, 151.21, scrape.Throttle(0.0))
+    with contextlib.redirect_stderr(io.StringIO()):
+        scrape.fetch_point(-33.87, 151.21, scrape.Throttle(0.0))
     check(False, "a blocked address aborts the sweep")
 except scrape.FetchError as exc:
     check("refused" in str(exc) and time.monotonic() - began < 1.0,
           f"{scrape.BLOCKED_AFTER} 429s with no success aborts in "
           f"{time.monotonic() - began:.2f}s rather than grinding")
 scrape.RATE_LIMIT_ATTEMPTS = patient
+
+# Backoff escalates on consecutive failures and resets after a success, so an
+# isolated 429 in an otherwise healthy sweep stays cheap.
+scrape.PAUSE_BASE_S, scrape.MAX_PAUSE_S = 4.0, 120.0
+escalating = scrape.Throttle()
+first, _, _ = escalating.penalise()
+for _ in range(4):
+    escalating.penalise()
+fifth, _, _ = escalating.penalise()
+check(fifth > first * 3,
+      f"consecutive 429s escalate ({first:.1f}s -> {fifth:.1f}s)")
+escalating.succeeded()
+after, _, _ = escalating.penalise()
+check(after <= scrape.PAUSE_BASE_S * 1.5,
+      f"a success resets the escalation ({fifth:.1f}s -> {after:.1f}s, "
+      f"ceiling {scrape.PAUSE_BASE_S * 1.5:.1f}s)")
+scrape.PAUSE_BASE_S = scrape.MAX_PAUSE_S = 0.0
 
 warmed = scrape.Throttle(0.0)
 warmed.succeeded()
@@ -200,7 +222,7 @@ check(warmed.blocked,
 # what the first CI failure was actually about.
 # =============================================================================
 
-scrape.PAUSE_BASE_S = scrape.MAX_PAUSE_S = 0.3
+scrape.PAUSE_BASE_S = scrape.MAX_PAUSE_S = 0.4
 limited_once = {"done": False}
 observed = []
 lock = threading.Lock()
@@ -221,7 +243,8 @@ def limit_first_caller(lat, lon, offset, throttle=None):
 
 scrape.request_page = limit_first_caller
 start = time.monotonic()
-scrape.sweep({(row, 0) for row in range(16)})
+with contextlib.redirect_stderr(io.StringIO()):
+    scrape.sweep({(row, 0) for row in range(16)})
 gap = min(observed) - start if observed else 0.0
 check(gap >= 0.15,
       f"a single 429 held the whole pool back {gap:.2f}s "
