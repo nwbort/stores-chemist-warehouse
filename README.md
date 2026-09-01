@@ -50,23 +50,33 @@ country in overlapping 26 km circles and dedupes by store key — rung 6 of
 Probe points sit on a 34 km lattice, below the 36.8 km at which circles of this
 radius start leaving gaps. `scrape.py`'s docstring has the full reasoning.
 
-There are two sweeps, on two cadences:
+There are two sweeps:
 
-| | Points | Runtime | Cadence | Finds |
+| | Points | Local | On a rate-limited runner | Used for |
 | --- | --- | --- | --- | --- |
-| `--full` | 7,738 | ~12 min | Sundays | Everything, including a store in a town that has never had one |
-| `--targeted` | ~480 | ~1 min | Daily | Everything within ~26 km of a store already in `stores.json` — which is where nearly every new store appears |
+| `--daily` | ~1,000 | ~1.5 min | 10–25 min | The scheduled run |
+| `--full` | 7,738 | ~12 min | hours | Bootstrapping and verification |
 
-The targeted sweep seeds itself from the committed `stores.json` and probes
-each known store's lattice cell plus the eight around it, so anything the
-weekly sweep discovers is covered by every daily run afterwards. With no
-`stores.json` to seed from, it falls back to a full sweep.
+`--daily` is the union of two things. It re-checks every store already in
+`stores.json` — each known store's lattice cell plus the eight around it — so
+the output is a **complete** list every day: a closure drops out at once, and
+anything new within ~26 km of the existing network turns up immediately, which
+is where nearly every new store appears. On top of that it sweeps one
+fourteenth of the discovery lattice, rotating by date, so the whole country is
+still covered — just over a fortnight rather than overnight.
+
+The slicing exists because a full sweep is 7,738 requests: 12 minutes from an
+ordinary connection, but *hours* from a rate-limited runner, and more than this
+source should be asked for nightly either way. The only thing it delays is
+finding a store that opens somewhere the network has never reached, and store
+networks move far more slowly than a fortnight. With no `stores.json` to seed
+from, `--daily` falls back to a full sweep.
 
 ## Running locally
 
 ```bash
-./scrape.sh              # full national sweep
-./scrape.sh --targeted   # fast sweep around known stores
+./scrape.sh --daily      # known stores plus today's discovery slice
+./scrape.sh              # full national sweep (bootstrap / verification)
 ./scrape.sh --check      # offline checks (geometry + retry), no requests
 ```
 
@@ -80,20 +90,19 @@ From an ordinary connection the endpoint is happy to be swept: 7,738 requests
 at 8 workers without a single 429, and a deliberate 600-request burst at 40
 workers could not provoke one.
 
-**From GitHub-hosted runners it does not work at all.** Not "slowly" — the
-bot filter in front of the API answers *every* request with a 429, including
-at one request every two seconds, and never lets one through. The runner that
-was tested sat in Azure `westus2`; a US datacentre address hitting an
-Australian retail API is exactly the profile Cloudflare rejects. That is a
-refusal, not a throttle, and no amount of client-side politeness changes it.
+**From GitHub-hosted runners it is throttled hard**, and the daily sweep takes
+10–25 minutes instead of 90 seconds. Measured over several runs: 15–49
+rate-limit responses, settling around 0.7–0.9 requests/second, but completing
+and returning the same 564 stores as a local sweep.
 
-So the scheduled workflow will fail on a GitHub-hosted runner until it is
-pointed at a runner with a residential or Australian egress address. `--full`
-and `--targeted` both work fine locally, which is how `stores.json` is
-currently produced.
+One earlier run was refused outright — *every* request 429'd, including at one
+request every two seconds, with nothing getting through in 99 seconds. That was
+before the full browser header set was sent; the `sec-ch-ua` / `sec-fetch-*`
+group appears to be what the filter keys on. Runners are Azure-hosted, and a US
+datacentre address on an Australian retail API is the profile Cloudflare scores
+worst, so expect this to stay variable.
 
-The scraper is built for the throttled case anyway, since that is what a
-better-placed runner will meet:
+How the scraper copes:
 
 - **One `Throttle` shared by the pool.** A 429 pauses *every* worker. Eight
   workers backing off independently is still eight times the pressure on the
@@ -110,6 +119,9 @@ better-placed runner will meet:
 - **Fail fast when refused.** 40 rate-limit responses with nothing at all
   getting through aborts with a message saying so, rather than grinding until
   the job times out.
+
+- **Sliced discovery.** The daily sweep is ~1,000 points rather than 7,738,
+  which is what keeps it inside a job timeout at 0.7 req/s.
 
 `tests/check_retry.py` covers all of it against a fake API. None of it can be
 exercised against the real endpoint from a normal connection.
@@ -166,7 +178,8 @@ Where this repo differs, and why:
   is fetch and transform interleaved — a point's results are deduped against
   every other point's as they arrive. Splitting it would mean writing ~7,700
   raw payloads to disk to read them straight back.
-- **Two cron entries instead of one.** See the cadence table above.
+- **The scheduled sweep is not a complete sweep.** It re-checks every known
+  store daily but only a fourteenth of the discovery lattice. See above.
 - **A test directory**, which most `stores-*` repos do not have. Two things
   here can be wrong without looking wrong. A gap in the lattice silently drops
   whatever stores were inside it, so `tests/check_coverage.py` proves the

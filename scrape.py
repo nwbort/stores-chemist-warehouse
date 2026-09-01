@@ -52,22 +52,27 @@ Lambert azimuthal maths to save four minutes a week. Not worth it.
 Two sweeps, because the data has two tiers (PRINCIPLES.md section 4):
 
   full      Every lattice cell whose centre is on or near Australian land,
-            plus the external territories: 7,738 points, about 12 minutes.
-            This is the sweep that can discover a store in a town where we
-            have never seen one. Weekly.
+            plus the external territories: 7,738 points, about 12 minutes from
+            an ordinary connection. Used to bootstrap stores.json and to check
+            the daily cadence has not drifted; too slow to schedule against a
+            rate-limited runner, where it would take hours.
 
-  targeted  Only the cells that already contain a known store, plus the eight
-            lattice neighbours of each - so it still sees anything new within
-            ~26 km of the existing network, which is where nearly every new
-            store turns up. About 480 points and under a minute, seeded from
-            the committed stores.json, so a store the weekly sweep discovers
-            is covered by every daily run afterwards. Falls back to a full
-            sweep when there is no stores.json to seed from.
+  daily     Two things unioned. First, the cells that already contain a known
+            store plus the eight lattice neighbours of each - seeded from the
+            committed stores.json, so every store on file is re-checked every
+            run and anything new within ~26 km of the existing network turns
+            up immediately, which is where nearly every new store appears.
+            Second, one rotating DISCOVERY_SHARDS-th of the lattice, so the
+            whole country is still covered, just over a fortnight rather than
+            overnight. About 1,000 points. Falls back to a full sweep when
+            there is no stores.json to seed from.
 
-            Run back to back against the full sweep, the two produce
-            byte-identical files.
+            Because the first half covers every known store, the output is a
+            complete list on any given day: a closure drops out at once, and
+            the slicing only delays finding a store that opens somewhere the
+            network has never reached.
 
-Usage:  ./scrape.sh [--full | --targeted]
+Usage:  ./scrape.sh [--full | --daily]
 """
 
 import argparse
@@ -208,6 +213,16 @@ EXTERNAL_TERRITORIES = [
 # the outline being drawn a little tight somewhere; one ring is SPACING_KM.
 MASK_BUFFER_CELLS = 1
 
+# The discovery lattice is swept a slice at a time, one slice per day, so the
+# whole country is covered every DISCOVERY_SHARDS days. A full sweep is 7,738
+# points, which is 12 minutes from a normal connection but around three hours
+# from a rate-limited GitHub runner - well past any sane job timeout. Slicing
+# it keeps every daily run to roughly a thousand points while still finding a
+# store that opens somewhere the network has never reached, just over a
+# fortnight rather than overnight. Store networks move far more slowly than
+# that (PRINCIPLES.md section 4).
+DISCOVERY_SHARDS = 14
+
 # Lattice anchor. Nothing depends on these values beyond both sweeps sharing
 # them, which is what makes the targeted probe set a strict subset of the full
 # one.
@@ -296,6 +311,25 @@ def full_sweep_cells():
     for lat, lon in EXTERNAL_TERRITORIES:
         cells.add(lattice_cell(lat, lon))
     return cells
+
+
+def discovery_shard(cells, index):
+    """A deterministic 1/DISCOVERY_SHARDS slice of the lattice.
+
+    Sliced by a cheap mix of the cell indices rather than by row or column, so
+    each day's slice is scattered over the whole country instead of being one
+    stripe of it. Python's own hash() is salted per process and would give a
+    different partition on every run.
+    """
+    index %= DISCOVERY_SHARDS
+    return {c for c in cells
+            if (c[0] * 7919 + c[1] * 104729) % DISCOVERY_SHARDS == index}
+
+
+def shard_for_day(day=None):
+    """Which slice today gets. Rotates by date so runs advance on their own."""
+    day = day or datetime.date.today()
+    return day.toordinal() % DISCOVERY_SHARDS
 
 
 def targeted_sweep_cells(stores):
@@ -664,25 +698,34 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--full", action="store_const", const="full", dest="sweep",
-                       help="sweep the whole country (slow, weekly)")
-    group.add_argument("--targeted", action="store_const", const="targeted", dest="sweep",
-                       help="sweep around known stores only (fast, daily)")
+                       help="sweep the whole lattice (7,738 points; bootstrap and verification)")
+    group.add_argument("--daily", action="store_const", const="daily", dest="sweep",
+                       help="known stores plus today's discovery slice (the default cadence)")
     parser.set_defaults(sweep=os.environ.get("SWEEP", "full"))
     args = parser.parse_args()
 
     existing = load_existing()
 
     mode = args.sweep
-    if mode not in ("full", "targeted"):
-        sys.exit(f"error: unknown sweep mode {mode!r} (expected 'full' or 'targeted')")
-    if mode == "targeted" and not existing:
-        print(f"no usable {OUTPUT} to seed a targeted sweep from; running a full sweep",
+    if mode not in ("full", "daily"):
+        sys.exit(f"error: unknown sweep mode {mode!r} (expected 'full' or 'daily')")
+    if mode == "daily" and not existing:
+        print(f"no usable {OUTPUT} to seed a daily sweep from; running a full sweep",
               file=sys.stderr)
         mode = "full"
 
-    cells = full_sweep_cells() if mode == "full" else targeted_sweep_cells(existing)
+    if mode == "full":
+        cells = full_sweep_cells()
+        detail = "the whole lattice"
+    else:
+        shard = shard_for_day()
+        known = targeted_sweep_cells(existing)
+        slice_ = discovery_shard(full_sweep_cells(), shard)
+        cells = known | slice_
+        detail = (f"{len(known)} around known stores, plus discovery slice "
+                  f"{shard + 1}/{DISCOVERY_SHARDS} ({len(slice_ - known)} new)")
     print(f"{mode} sweep: {len(cells)} probe points at {SPACING_KM:g} km spacing "
-          f"({RADIUS_KM:g} km radius)", file=sys.stderr)
+          f"({RADIUS_KM:g} km radius) - {detail}", file=sys.stderr)
 
     try:
         raw = sweep(cells)

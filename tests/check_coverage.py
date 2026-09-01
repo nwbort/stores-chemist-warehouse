@@ -124,6 +124,21 @@ worst_rounding = max(
 check(worst_rounding < 0.02, f"4dp coordinate rounding moves a probe at most "
                              f"{worst_rounding * 1000:.0f} m")
 
+# 6. The daily discovery slices must partition the lattice exactly - every cell
+#    swept, none swept twice, and the same partition on every run (Python's own
+#    hash() is salted per process and would reshuffle it).
+slices = [scrape.discovery_shard(cells, i) for i in range(scrape.DISCOVERY_SHARDS)]
+covered = set().union(*slices)
+overlap = sum(len(s) for s in slices) - len(covered)
+sizes = sorted(len(s) for s in slices)
+check(covered == cells and overlap == 0,
+      f"{scrape.DISCOVERY_SHARDS} discovery slices partition all {len(cells)} cells "
+      f"({len(covered)} covered, {overlap} swept twice)")
+check(sizes[-1] - sizes[0] < len(cells) * 0.02 / scrape.DISCOVERY_SHARDS * 14,
+      f"slices are even, {sizes[0]}-{sizes[-1]} cells each")
+check(scrape.discovery_shard(cells, 3) == scrape.discovery_shard(cells, 3 + scrape.DISCOVERY_SHARDS),
+      "the slice index wraps, so a rotating day number is safe")
+
 print()
 if failures:
     sys.exit(f"{len(failures)} check(s) failed")

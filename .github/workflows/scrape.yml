@@ -1,12 +1,12 @@
-# Two cadences, because the data has two tiers (PRINCIPLES.md section 4).
+# One job, once a day.
 #
 # The API only answers "what is within 26 km of this point", so a complete list
-# means covering the country in overlapping circles - about 7,700 requests and
-# a quarter of an hour. That is far too much to run at a retailer nightly for
-# data that changes a few times a month, so it runs weekly. The daily run
-# sweeps only the neighbourhood of the stores already in stores.json, which is
-# a few hundred requests and catches everything except a store opening more
-# than ~26 km from any existing one. See the docstring in scrape.py.
+# means covering the country in overlapping circles - 7,738 requests. That is
+# 12 minutes from an ordinary connection but hours from a rate-limited runner,
+# and far more than this source should be asked for nightly either way. So the
+# daily run re-checks every store already on file (which keeps the output a
+# complete list) and sweeps one fourteenth of the discovery lattice, rotating
+# by date. See the docstring in scrape.py.
 
 name: Scrape
 
@@ -19,13 +19,11 @@ on:
       sweep:
         description: Which sweep to run
         type: choice
-        options: [full, targeted]
-        default: full
+        options: [daily, full]
+        default: daily
   schedule:
-  # Daily targeted sweep at 2:47 PM UTC
+  # Daily at 2:47 PM UTC
   - cron: '47 14 * * *'
-  # Full national sweep, Sundays at 3:09 PM UTC
-  - cron: '9 15 * * 0'
 
 permissions:
   contents: write
@@ -37,9 +35,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    # The full sweep takes ~12 minutes. The ceiling is generous because a
-    # rate-limited run paces itself down and takes longer on purpose; it is
-    # here so a wedged run cannot stack up behind the concurrency group.
+    # A daily sweep is ~1,000 points: under a minute locally, but 10-25 minutes
+    # from a rate-limited runner, since it pauses when told to. The ceiling is
+    # generous for that, and is here so a wedged run cannot stack up behind the
+    # concurrency group.
     timeout-minutes: 60
     if: ${{ !github.event.repository.is_template }}
     steps:
@@ -50,14 +49,10 @@ jobs:
 
     - name: Run the scraper
       env:
-        # Cron picks the mode; a manual run chooses, and a push gets the cheap
-        # one so that iterating on the scraper does not mean 7,700 requests.
+        # The schedule always runs the daily cadence; a manual run may ask for
+        # a full sweep instead, which is really a local/bootstrap operation.
         SWEEP: >-
-          ${{ github.event_name == 'schedule'
-              && (github.event.schedule == '9 15 * * 0' && 'full' || 'targeted')
-              || github.event_name == 'workflow_dispatch'
-              && inputs.sweep
-              || 'targeted' }}
+          ${{ github.event_name == 'workflow_dispatch' && inputs.sweep || 'daily' }}
       run: ./scrape.sh
 
     # Commit only when the data actually changed - `|| exit 0` handles the
