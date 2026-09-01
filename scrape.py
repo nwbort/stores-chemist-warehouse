@@ -117,8 +117,10 @@ RECOVERY_FACTOR = 0.9       # interval multiplier per success; ~44 to undo a 429
 PAUSE_BASE_S = 5.0
 MAX_PAUSE_S = 120.0
 REPORT_EVERY_S = 15.0       # keep the rate-limit log readable
-# Consecutive 429s with not one request ever getting through. That is not
-# throttling, it is a refusal, and no amount of backing off will fix it.
+# Rate-limit responses in a row with nothing at all getting through between
+# them. That is not throttling, it is a refusal, and no amount of backing off
+# will fix it. Counted since the last success rather than since the start, so
+# a run that is refused only after warming up still trips it.
 BLOCKED_AFTER = 40
 
 # A drop this large is a broken scraper, not a mass closure.
@@ -349,6 +351,7 @@ class Throttle:
         self._last_report = 0.0
         self.penalties = 0
         self.successes = 0
+        self.since_success = 0
         self.blocked = False
         self.slowest_interval = interval
 
@@ -371,6 +374,7 @@ class Throttle:
         """Ease the pace back toward the floor after a request goes through."""
         with self._lock:
             self.successes += 1
+            self.since_success = 0
             if self._interval > MIN_INTERVAL_S:
                 self._interval = max(MIN_INTERVAL_S, self._interval * RECOVERY_FACTOR)
 
@@ -383,8 +387,9 @@ class Throttle:
         """
         with self._lock:
             self.penalties += 1
-            # Nothing has ever succeeded, so there is no pace to find.
-            self.blocked = self.successes == 0 and self.penalties >= BLOCKED_AFTER
+            self.since_success += 1
+            # Nothing is getting through, so there is no pace to find.
+            self.blocked = self.since_success >= BLOCKED_AFTER
             self._interval = min(MAX_INTERVAL_S, self._interval * BACKOFF_FACTOR)
             self.slowest_interval = max(self.slowest_interval, self._interval)
             # Our own escalating backoff, jittered so the pool does not resume
@@ -497,8 +502,8 @@ def fetch_point(lat, lon, throttle=None):
                         retry_after_seconds(exc.headers))
                     if throttle.blocked:
                         raise FetchError(
-                            f"{throttle.penalties} rate-limit responses and not one "
-                            f"request through: this address is being refused "
+                            f"{throttle.since_success} rate-limit responses in a row "
+                            f"with nothing getting through: this address is being refused "
                             f"outright, not throttled, so backing off further will "
                             f"not help. GitHub-hosted runners egress from shared "
                             f"datacentre IPs that this API's bot filter rejects; the "

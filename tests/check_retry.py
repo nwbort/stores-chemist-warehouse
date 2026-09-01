@@ -170,7 +170,10 @@ except scrape.FetchError:
 
 # An address that is refused outright rather than throttled has to fail fast.
 # The second CI run ground for 29 minutes without one request getting through;
-# there is no pace to discover in that state, so say so and stop.
+# there is no pace to discover in that state, so say so and stop. The count is
+# consecutive rather than total, so a run that is refused only after warming up
+# trips it too - an earlier version keyed off "no success ever", which a single
+# lucky request at the start would have disabled for good.
 patient = scrape.RATE_LIMIT_ATTEMPTS
 scrape.RATE_LIMIT_ATTEMPTS = 10 ** 6
 scrape.request_page = always_limited
@@ -183,6 +186,13 @@ except scrape.FetchError as exc:
           f"{scrape.BLOCKED_AFTER} 429s with no success aborts in "
           f"{time.monotonic() - began:.2f}s rather than grinding")
 scrape.RATE_LIMIT_ATTEMPTS = patient
+
+warmed = scrape.Throttle(0.0)
+warmed.succeeded()
+for _ in range(scrape.BLOCKED_AFTER):
+    warmed.penalise()
+check(warmed.blocked,
+      "a run refused after a successful start still trips the blocked check")
 
 
 # =============================================================================
