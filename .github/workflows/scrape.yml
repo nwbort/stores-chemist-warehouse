@@ -35,9 +35,10 @@ concurrency:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    # The full sweep takes ~15 minutes; the ceiling is here so a wedged run
-    # cannot stack up behind the concurrency group.
-    timeout-minutes: 45
+    # The full sweep takes ~12 minutes. The ceiling is generous because a
+    # rate-limited run paces itself down and takes longer on purpose; it is
+    # here so a wedged run cannot stack up behind the concurrency group.
+    timeout-minutes: 60
     if: ${{ !github.event.repository.is_template }}
     steps:
     - uses: actions/checkout@v4

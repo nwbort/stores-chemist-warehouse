@@ -71,12 +71,15 @@ Usage:  ./scrape.sh [--full | --targeted]
 """
 
 import argparse
+import datetime
+import email.utils
 import json
 import math
 import os
 import random
 import re
 import sys
+import threading
 import time
 import urllib.error
 import urllib.parse
@@ -99,8 +102,15 @@ SPACING_KM = 34.0
 PAGE_SIZE = 100          # hard API cap
 MAX_PAGES = 20           # a single point returning 2000 stores is a bug, not data
 WORKERS = 8              # PRINCIPLES.md section 6: parallelism is for finishing, not racing
-MAX_ATTEMPTS = 5
+MAX_ATTEMPTS = 5         # for connection errors and 5xx
 TIMEOUT = 30
+
+# Rate limiting gets its own, much more patient, budget - see Throttle below.
+RATE_LIMIT_ATTEMPTS = 8
+REQUEST_INTERVAL_S = 0.05   # global floor, ~20 req/s; does not bind at 8 workers
+MAX_INTERVAL_S = 2.0        # how far the run may pace itself down
+PAUSE_BASE_S = 5.0
+MAX_PAUSE_S = 120.0
 
 # A drop this large is a broken scraper, not a mass closure.
 MIN_RETAINED_FRACTION = 0.5
@@ -282,6 +292,86 @@ def targeted_sweep_cells(stores):
 
 
 # --------------------------------------------------------------------------
+# Pacing
+# --------------------------------------------------------------------------
+
+class Throttle:
+    """Request pacing shared by the whole worker pool.
+
+    It holds two things: a floor on the interval between requests, and a
+    deadline that a 429 pushes into the future. Both are global on purpose.
+    When the API rate-limits us, eight workers backing off independently is
+    still eight times the pressure on the thing that just asked us to slow
+    down - which is exactly how the first CI run burned all five of its
+    retries in 27 seconds and failed. One shared brake fixes that.
+
+    Note that this only ever fires in CI. From a residential connection the
+    endpoint absorbed 7,738 requests at 8 workers without a single 429, and a
+    deliberate 600-request burst at 40 workers could not provoke one either.
+    GitHub's runners egress from shared datacentre IPs that Cloudflare scores
+    far more harshly, so the pacing has to be adaptive rather than tuned to a
+    limit we can measure from here.
+    """
+
+    def __init__(self, interval=REQUEST_INTERVAL_S):
+        self._lock = threading.Lock()
+        self._interval = interval
+        self._next_slot = 0.0
+        self._paused_until = 0.0
+        self.penalties = 0
+
+    def wait(self):
+        """Claim the next slot and sleep until it comes round."""
+        with self._lock:
+            now = time.monotonic()
+            slot = max(now, self._next_slot, self._paused_until)
+            self._next_slot = slot + self._interval
+            delay = slot - now
+        if delay > 0:
+            time.sleep(delay)
+
+    def penalise(self, retry_after=None):
+        """Record a 429: pause every worker, and slow the run down for good.
+
+        The interval widening is the important half. A pause alone just walks
+        back into the same wall a few seconds later; if we are being limited,
+        the pace was wrong and should stay lower for the rest of the run.
+        """
+        with self._lock:
+            self.penalties += 1
+            if retry_after is None:
+                retry_after = min(MAX_PAUSE_S,
+                                  PAUSE_BASE_S * 2 ** min(self.penalties - 1, 5))
+            self._paused_until = max(self._paused_until,
+                                     time.monotonic() + retry_after)
+            self._interval = min(MAX_INTERVAL_S, max(self._interval, 0.05) * 1.5)
+            return retry_after, self._interval
+
+
+def retry_after_seconds(headers):
+    """Parse a Retry-After header - delta-seconds or an HTTP date. If the API
+    tells us how long to wait, that beats anything we would guess."""
+    value = (headers or {}).get("Retry-After")
+    if not value:
+        return None
+    value = value.strip()
+    try:
+        return max(0.0, min(MAX_PAUSE_S, float(value)))
+    except ValueError:
+        pass
+    try:
+        when = email.utils.parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+    if when is None:
+        return None
+    if when.tzinfo is None:
+        when = when.replace(tzinfo=datetime.timezone.utc)
+    delta = (when - datetime.datetime.now(datetime.timezone.utc)).total_seconds()
+    return max(0.0, min(MAX_PAUSE_S, delta))
+
+
+# --------------------------------------------------------------------------
 # Fetching
 # --------------------------------------------------------------------------
 
@@ -289,7 +379,9 @@ class FetchError(Exception):
     pass
 
 
-def request_page(lat, lon, offset):
+def request_page(lat, lon, offset, throttle=None):
+    if throttle is not None:
+        throttle.wait()
     query = urllib.parse.urlencode({
         "channel-type": "store",
         "latitude": f"{lat:.4f}",
@@ -303,20 +395,40 @@ def request_page(lat, lon, offset):
         return json.loads(resp.read().decode("utf-8"))
 
 
-def fetch_point(lat, lon):
-    """All stores within 26 km of one point, following offset pages."""
+def fetch_point(lat, lon, throttle=None):
+    """All stores within RADIUS_KM of one point, following offset pages."""
     found = []
     offset = 0
     for _ in range(MAX_PAGES):
         payload = None
-        for attempt in range(MAX_ATTEMPTS):
+        attempt = 0
+        rate_limited = 0
+        while True:
             try:
-                payload = request_page(lat, lon, offset)
+                payload = request_page(lat, lon, offset, throttle)
                 break
             except urllib.error.HTTPError as exc:
-                # A 4xx other than 429 means we are asking the wrong question;
+                if exc.code == 429:
+                    # Being asked to slow down is not an error, it is an
+                    # instruction. Give it far more patience than a flaky
+                    # connection gets, and let the whole pool feel it.
+                    rate_limited += 1
+                    if rate_limited > RATE_LIMIT_ATTEMPTS:
+                        raise FetchError(
+                            f"{lat:.4f},{lon:.4f} offset={offset}: rate limited "
+                            f"({RATE_LIMIT_ATTEMPTS}× HTTP 429) even after backing "
+                            f"off. If this is CI, the runner's shared IP is likely "
+                            f"the problem rather than the request rate."
+                        ) from exc
+                    pause, interval = (throttle.penalise(retry_after_seconds(exc.headers))
+                                       if throttle else (PAUSE_BASE_S, 0))
+                    print(f"  rate limited, pausing {pause:.0f}s and pacing every "
+                          f"{interval:.2f}s", file=sys.stderr, flush=True)
+                    time.sleep(pause * (0.5 + random.random()))
+                    continue
+                # Any other 4xx means we are asking the wrong question;
                 # retrying just asks it again. Surface it.
-                if exc.code != 429 and 400 <= exc.code < 500:
+                if 400 <= exc.code < 500:
                     raise FetchError(
                         f"{lat:.4f},{lon:.4f} offset={offset}: HTTP {exc.code} "
                         f"{exc.read()[:200]!r}"
@@ -324,7 +436,8 @@ def fetch_point(lat, lon):
                 last = f"HTTP {exc.code}"
             except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
                 last = repr(exc)
-            if attempt == MAX_ATTEMPTS - 1:
+            attempt += 1
+            if attempt >= MAX_ATTEMPTS:
                 raise FetchError(f"{lat:.4f},{lon:.4f} offset={offset}: gave up after "
                                  f"{MAX_ATTEMPTS} attempts, last error {last}")
             # Exponential backoff with jitter.
@@ -342,15 +455,13 @@ def sweep(cells):
     """Fetch every cell, returning {key: raw channel}. Any hard failure aborts."""
     points = sorted(cell_centre(cell) for cell in cells)
     total = len(points)
+    throttle = Throttle()
     stores = {}
     done = 0
     started = time.time()
 
-    def work(point):
-        return fetch_point(*point)
-
     with ThreadPoolExecutor(WORKERS) as pool:
-        for result in pool.map(work, points):
+        for result in pool.map(lambda point: fetch_point(*point, throttle=throttle), points):
             for entry in result:
                 channel = entry.get("channel") or {}
                 key = channel.get("key")
@@ -361,6 +472,10 @@ def sweep(cells):
                 rate = done / max(time.time() - started, 1e-9)
                 print(f"  {done}/{total} points, {len(stores)} stores, "
                       f"{rate:.1f} req/s", file=sys.stderr, flush=True)
+
+    if throttle.penalties:
+        print(f"note: rate limited {throttle.penalties} time(s); the sweep paced "
+              f"itself down and completed", file=sys.stderr)
     return stores
 
 

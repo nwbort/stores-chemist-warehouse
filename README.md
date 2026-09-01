@@ -67,12 +67,32 @@ weekly sweep discovers is covered by every daily run afterwards. With no
 ```bash
 ./scrape.sh              # full national sweep
 ./scrape.sh --targeted   # fast sweep around known stores
-./scrape.sh --check      # lattice and coverage checks, no requests
+./scrape.sh --check      # offline checks (geometry + retry), no requests
 ```
 
-Standard library Python only — no `requirements.txt`, no install step. The
-coverage checks run automatically before every scrape, since the geometry is
-cheap to verify and expensive to get wrong.
+Standard library Python only — no `requirements.txt`, no install step. Both
+check suites run automatically before every scrape; together they are a few
+seconds and neither touches the network.
+
+## Rate limiting
+
+From a normal connection the endpoint is happy to be swept: 7,738 requests at
+8 workers without a single 429, and a deliberate 600-request burst at 40
+workers could not provoke one. **From GitHub Actions it is a different story** —
+runners egress from shared datacentre IPs that Cloudflare scores far more
+harshly, and the first CI run was rate-limited within 30 seconds.
+
+So the pool shares one `Throttle`. A 429 pauses *every* worker, honours
+`Retry-After` when the API sends one, and permanently widens the interval
+between requests for the rest of the run — if we are being limited, the pace
+was wrong and should stay lower. Eight workers backing off independently is
+still eight times the pressure on the thing that just asked us to slow down,
+which is exactly how the first run burned all five of its retries in 27
+seconds and failed.
+
+`tests/check_retry.py` covers all of it against a fake API, including the
+"one worker's 429 holds the whole pool" regression. None of it can be
+exercised against the real endpoint from a normal connection.
 
 As a check on all of that: the two sweeps were run back to back and returned
 byte-identical files, and 600 randomly chosen points *off* the lattice were
@@ -131,8 +151,10 @@ Where this repo differs, and why:
   every other point's as they arrive. Splitting it would mean writing ~7,700
   raw payloads to disk to read them straight back.
 - **Two cron entries instead of one.** See the cadence table above.
-- **A test directory**, which most `stores-*` repos do not have. The lattice is
-  the one part of this scraper that can be wrong in a way that produces
-  plausible output — a gap in the grid silently drops whatever stores were in
-  it. `tests/check_coverage.py` proves the country is covered, and it is the
-  reason the mask is allowed to be a hand-drawn polygon.
+- **A test directory**, which most `stores-*` repos do not have. Two things
+  here can be wrong without looking wrong. A gap in the lattice silently drops
+  whatever stores were inside it, so `tests/check_coverage.py` proves the
+  country is covered — which is what lets the mask be a hand-drawn polygon.
+  And the retry path only executes when something has already gone wrong, so
+  it went out untested and failed on the first CI run;
+  `tests/check_retry.py` now exercises it against a fake.
