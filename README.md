@@ -74,29 +74,45 @@ Standard library Python only — no `requirements.txt`, no install step. Both
 check suites run automatically before every scrape; together they are a few
 seconds and neither touches the network.
 
-## Rate limiting
+## Rate limiting, and where this can run
 
-From a normal connection the endpoint is happy to be swept: 7,738 requests at
-8 workers without a single 429, and a deliberate 600-request burst at 40
-workers could not provoke one. **From GitHub Actions it is a different story** —
-runners egress from shared datacentre IPs that Cloudflare scores far more
-harshly, and the first CI run was rate-limited within 30 seconds.
+From an ordinary connection the endpoint is happy to be swept: 7,738 requests
+at 8 workers without a single 429, and a deliberate 600-request burst at 40
+workers could not provoke one.
 
-So the pool shares one `Throttle`. A 429 pauses *every* worker, honours
-`Retry-After` when the API sends one, and permanently widens the interval
-between requests for the rest of the run — if we are being limited, the pace
-was wrong and should stay lower. Eight workers backing off independently is
-still eight times the pressure on the thing that just asked us to slow down,
-which is exactly how the first run burned all five of its retries in 27
-seconds and failed.
+**From GitHub-hosted runners it does not work at all.** Not "slowly" — the
+bot filter in front of the API answers *every* request with a 429, including
+at one request every two seconds, and never lets one through. The runner that
+was tested sat in Azure `westus2`; a US datacentre address hitting an
+Australian retail API is exactly the profile Cloudflare rejects. That is a
+refusal, not a throttle, and no amount of client-side politeness changes it.
 
-`tests/check_retry.py` covers all of it against a fake API, including the
-"one worker's 429 holds the whole pool" regression. None of it can be
+So the scheduled workflow will fail on a GitHub-hosted runner until it is
+pointed at a runner with a residential or Australian egress address. `--full`
+and `--targeted` both work fine locally, which is how `stores.json` is
+currently produced.
+
+The scraper is built for the throttled case anyway, since that is what a
+better-placed runner will meet:
+
+- **One `Throttle` shared by the pool.** A 429 pauses *every* worker. Eight
+  workers backing off independently is still eight times the pressure on the
+  thing that just asked us to slow down.
+- **Additive-increase / multiplicative-decrease.** A 429 widens the interval,
+  and every success narrows it again. A throttle that only slows down is a
+  one-way ratchet — the first 429 of a sweep pins every remaining point at the
+  worst pace it ever saw, which turned a 55-second job into a 30-minute one.
+- **`Retry-After` is a floor, never a replacement.** Cloudflare answers a
+  blocked address with one that parses as zero; obeying it literally means no
+  backoff at all.
+- **A gentle start.** Opening at full tilt from a datacentre IP is part of what
+  trips the filter.
+- **Fail fast when refused.** 40 rate-limit responses with nothing at all
+  getting through aborts with a message saying so, rather than grinding until
+  the job times out.
+
+`tests/check_retry.py` covers all of it against a fake API. None of it can be
 exercised against the real endpoint from a normal connection.
-
-As a check on all of that: the two sweeps were run back to back and returned
-byte-identical files, and 600 randomly chosen points *off* the lattice were
-then probed independently and turned up no store the full sweep had missed.
 
 ## Output
 

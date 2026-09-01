@@ -73,6 +73,7 @@ Usage:  ./scrape.sh [--full | --targeted]
 import argparse
 import datetime
 import email.utils
+import gzip
 import json
 import math
 import os
@@ -84,6 +85,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import zlib
 from concurrent.futures import ThreadPoolExecutor
 
 API = "https://api.chemistwarehouse.com.au/web/v1/channels/cwr-cw-au/en/radius"
@@ -107,10 +109,17 @@ TIMEOUT = 30
 
 # Rate limiting gets its own, much more patient, budget - see Throttle below.
 RATE_LIMIT_ATTEMPTS = 8
-REQUEST_INTERVAL_S = 0.05   # global floor, ~20 req/s; does not bind at 8 workers
-MAX_INTERVAL_S = 2.0        # how far the run may pace itself down
+MIN_INTERVAL_S = 0.05       # ~20 req/s ceiling; does not bind at 8 workers
+START_INTERVAL_S = 0.15     # open gently, then accelerate if nothing pushes back
+MAX_INTERVAL_S = 5.0        # how far the run may pace itself down
+BACKOFF_FACTOR = 2.5        # interval multiplier on a 429
+RECOVERY_FACTOR = 0.9       # interval multiplier per success; ~44 to undo a 429
 PAUSE_BASE_S = 5.0
 MAX_PAUSE_S = 120.0
+REPORT_EVERY_S = 15.0       # keep the rate-limit log readable
+# Consecutive 429s with not one request ever getting through. That is not
+# throttling, it is a refusal, and no amount of backing off will fix it.
+BLOCKED_AFTER = 40
 
 # A drop this large is a broken scraper, not a mass closure.
 MIN_RETAINED_FRACTION = 0.5
@@ -119,11 +128,23 @@ USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
 )
+# The full set the locator's own frontend sends, minus its cookies (which the
+# endpoint does not require). PRINCIPLES.md section 6: look like a normal
+# client. The sec-ch-ua / sec-fetch-* group is the part that matters - their
+# absence is itself a signal to the bot filter in front of this API.
 HEADERS = {
     "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
     "accept-language": "en-AU,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
     "origin": "https://www.chemistwarehouse.com.au",
+    "priority": "u=1, i",
     "referer": "https://www.chemistwarehouse.com.au/",
+    "sec-ch-ua": '"Chromium";v="152", "Not?A_Brand";v="24", "Google Chrome";v="152"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-site",
     "user-agent": USER_AGENT,
 }
 
@@ -298,27 +319,43 @@ def targeted_sweep_cells(stores):
 class Throttle:
     """Request pacing shared by the whole worker pool.
 
-    It holds two things: a floor on the interval between requests, and a
-    deadline that a 429 pushes into the future. Both are global on purpose.
-    When the API rate-limits us, eight workers backing off independently is
-    still eight times the pressure on the thing that just asked us to slow
-    down - which is exactly how the first CI run burned all five of its
-    retries in 27 seconds and failed. One shared brake fixes that.
+    It holds a floor on the interval between requests and a deadline that a 429
+    pushes into the future. Both are global on purpose. When the API rate-limits
+    us, eight workers backing off independently is still eight times the
+    pressure on the thing that just asked us to slow down - which is how the
+    first CI run burned all five of its retries in 27 seconds and failed.
 
-    Note that this only ever fires in CI. From a residential connection the
-    endpoint absorbed 7,738 requests at 8 workers without a single 429, and a
-    deliberate 600-request burst at 40 workers could not provoke one either.
-    GitHub's runners egress from shared datacentre IPs that Cloudflare scores
-    far more harshly, so the pacing has to be adaptive rather than tuned to a
-    limit we can measure from here.
+    The pace is additive-increase/multiplicative-decrease, and the recovery
+    half matters as much as the backoff. A throttle that only ever slows down
+    is a one-way ratchet: the first 429 of a sweep holds every remaining point
+    at the slowest pace it ever saw. That is not theoretical - it turned a
+    55-second CI job into a 30-minute one on the second attempt, which is why
+    `succeeded()` exists.
+
+    It also starts deliberately gentle. Opening at full tilt from a datacentre
+    IP is what appears to trip the limit in the first place; from a residential
+    connection the endpoint never pushes back at all - 7,738 requests at 8
+    workers without a single 429, and a deliberate 600-request burst at 40
+    workers could not provoke one. GitHub's runners egress from shared IPs that
+    Cloudflare scores far more harshly, so the pace has to be discovered at
+    runtime rather than tuned to a limit that is invisible from here.
     """
 
-    def __init__(self, interval=REQUEST_INTERVAL_S):
+    def __init__(self, interval=START_INTERVAL_S):
         self._lock = threading.Lock()
         self._interval = interval
         self._next_slot = 0.0
         self._paused_until = 0.0
+        self._last_report = 0.0
         self.penalties = 0
+        self.successes = 0
+        self.blocked = False
+        self.slowest_interval = interval
+
+    @property
+    def interval(self):
+        with self._lock:
+            return self._interval
 
     def wait(self):
         """Claim the next slot and sleep until it comes round."""
@@ -330,22 +367,47 @@ class Throttle:
         if delay > 0:
             time.sleep(delay)
 
-    def penalise(self, retry_after=None):
-        """Record a 429: pause every worker, and slow the run down for good.
+    def succeeded(self):
+        """Ease the pace back toward the floor after a request goes through."""
+        with self._lock:
+            self.successes += 1
+            if self._interval > MIN_INTERVAL_S:
+                self._interval = max(MIN_INTERVAL_S, self._interval * RECOVERY_FACTOR)
 
-        The interval widening is the important half. A pause alone just walks
-        back into the same wall a few seconds later; if we are being limited,
-        the pace was wrong and should stay lower for the rest of the run.
+    def penalise(self, retry_after=None):
+        """Record a 429: slow the whole pool down and pause it.
+
+        Returns (pause, interval, should_report) - the caller logs only when
+        the third is true, so a heavily limited run does not produce thousands
+        of identical lines.
         """
         with self._lock:
             self.penalties += 1
-            if retry_after is None:
-                retry_after = min(MAX_PAUSE_S,
-                                  PAUSE_BASE_S * 2 ** min(self.penalties - 1, 5))
-            self._paused_until = max(self._paused_until,
-                                     time.monotonic() + retry_after)
-            self._interval = min(MAX_INTERVAL_S, max(self._interval, 0.05) * 1.5)
-            return retry_after, self._interval
+            # Nothing has ever succeeded, so there is no pace to find.
+            self.blocked = self.successes == 0 and self.penalties >= BLOCKED_AFTER
+            self._interval = min(MAX_INTERVAL_S, self._interval * BACKOFF_FACTOR)
+            self.slowest_interval = max(self.slowest_interval, self._interval)
+            # Our own escalating backoff, jittered so the pool does not resume
+            # in lockstep.
+            backoff = min(MAX_PAUSE_S,
+                          PAUSE_BASE_S * 2 ** min(self.penalties - 1, 4))
+            pause = backoff * (0.5 + random.random())
+            # Retry-After is a floor, never a replacement. Cloudflare answers
+            # a blocked IP with a Retry-After that parses as zero, and an
+            # earlier version obeyed it literally - so it retried flat out,
+            # got refused again, and never recovered. Honour the header when
+            # it asks for longer than we planned; ignore it when it asks for
+            # less.
+            if retry_after is not None:
+                pause = max(pause, min(MAX_PAUSE_S, retry_after))
+            now = time.monotonic()
+            # The pause lands here, not in a sleep in the caller. Doing both
+            # double-counts it, and the two compound on every retry.
+            self._paused_until = max(self._paused_until, now + pause)
+            report = now - self._last_report > REPORT_EVERY_S
+            if report:
+                self._last_report = now
+            return pause, self._interval, report
 
 
 def retry_after_seconds(headers):
@@ -392,7 +454,15 @@ def request_page(lat, lon, offset, throttle=None):
     })
     req = urllib.request.Request(f"{API}?{query}", headers=HEADERS)
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+        raw = resp.read()
+        if resp.headers.get("Content-Encoding") == "gzip":
+            raw = gzip.decompress(raw)
+        elif resp.headers.get("Content-Encoding") == "deflate":
+            raw = zlib.decompress(raw, -zlib.MAX_WBITS)
+        payload = json.loads(raw.decode("utf-8"))
+    if throttle is not None:
+        throttle.succeeded()
+    return payload
 
 
 def fetch_point(lat, lon, throttle=None):
@@ -420,11 +490,28 @@ def fetch_point(lat, lon, throttle=None):
                             f"off. If this is CI, the runner's shared IP is likely "
                             f"the problem rather than the request rate."
                         ) from exc
-                    pause, interval = (throttle.penalise(retry_after_seconds(exc.headers))
-                                       if throttle else (PAUSE_BASE_S, 0))
-                    print(f"  rate limited, pausing {pause:.0f}s and pacing every "
-                          f"{interval:.2f}s", file=sys.stderr, flush=True)
-                    time.sleep(pause * (0.5 + random.random()))
+                    if throttle is None:
+                        time.sleep(PAUSE_BASE_S)
+                        continue
+                    pause, interval, report = throttle.penalise(
+                        retry_after_seconds(exc.headers))
+                    if throttle.blocked:
+                        raise FetchError(
+                            f"{throttle.penalties} rate-limit responses and not one "
+                            f"request through: this address is being refused "
+                            f"outright, not throttled, so backing off further will "
+                            f"not help. GitHub-hosted runners egress from shared "
+                            f"datacentre IPs that this API's bot filter rejects; the "
+                            f"same sweep runs fine from an ordinary connection. See "
+                            f"the rate limiting section of the README."
+                        ) from exc
+                    if report:
+                        print(f"  rate limited ({throttle.penalties} so far), pausing "
+                              f"{pause:.0f}s, now pacing every {interval:.2f}s",
+                              file=sys.stderr, flush=True)
+                    # No sleep here: penalise() already pushed the shared pause
+                    # deadline, and wait() blocks on it. Sleeping as well
+                    # double-counts every pause and the two compound.
                     continue
                 # Any other 4xx means we are asking the wrong question;
                 # retrying just asks it again. Surface it.
@@ -470,12 +557,14 @@ def sweep(cells):
             done += 1
             if done % 250 == 0 or done == total:
                 rate = done / max(time.time() - started, 1e-9)
+                paced = f", pacing every {throttle.interval:.2f}s" if throttle.penalties else ""
                 print(f"  {done}/{total} points, {len(stores)} stores, "
-                      f"{rate:.1f} req/s", file=sys.stderr, flush=True)
+                      f"{rate:.1f} req/s{paced}", file=sys.stderr, flush=True)
 
     if throttle.penalties:
-        print(f"note: rate limited {throttle.penalties} time(s); the sweep paced "
-              f"itself down and completed", file=sys.stderr)
+        print(f"note: rate limited {throttle.penalties} time(s); slowest pace was "
+              f"one request every {throttle.slowest_interval:.2f}s, recovered to "
+              f"{throttle.interval:.2f}s", file=sys.stderr)
     return stores
 
 

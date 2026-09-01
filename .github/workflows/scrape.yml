@@ -10,8 +10,10 @@
 
 name: Scrape
 
+# No `on: push`. The source is rate-sensitive enough that a scrape per commit
+# is a bad trade (PRINCIPLES.md section 4), and the offline checks that guard
+# the tricky parts run locally before every scrape anyway.
 on:
-  push:
   workflow_dispatch:
     inputs:
       sweep:
