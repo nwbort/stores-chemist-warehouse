@@ -3950,7 +3950,8 @@
     "capabilities": [
       "click-and-collect",
       "cw-au",
-      "fast-delivery"
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
@@ -3965,8 +3966,8 @@
     "phone": "+61351442338",
     "fax": "+61351447440",
     "email": "sale@chemistwarehouse.com.au",
-    "latitude": -38.106728,
-    "longitude": 147.065876,
+    "latitude": -38.106873,
+    "longitude": 147.065801,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -5005,8 +5006,8 @@
     ],
     "address": {
       "building": null,
-      "street_number": "339 Brisbane St",
-      "street_name": null,
+      "street_number": "Tenancy 4 and 5, HOME HQ",
+      "street_name": "339 Brisbane Street",
       "city": "Ipswich",
       "region": null,
       "state": "Queensland",
@@ -5016,8 +5017,8 @@
     "phone": "+61732021303",
     "fax": "+61738129110",
     "email": "ipswich@chemistwarehouse.com.au",
-    "latitude": -27.6196,
-    "longitude": 152.748,
+    "latitude": -27.619513,
+    "longitude": 152.748037,
     "opening_hours": {
       "monday": {
         "from": "08:30",
@@ -6973,7 +6974,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "429 to 433 Sydney Road",
+      "street_number": "462 - 464 Sydney Road,",
       "street_name": null,
       "city": "Brunswick",
       "region": null,
@@ -6984,8 +6985,8 @@
     "phone": "+61393805657",
     "fax": "+61393804806",
     "email": "brunswick@chemistwarehouse.com.au",
-    "latitude": -37.7674,
-    "longitude": 144.962,
+    "latitude": -37.767183,
+    "longitude": 144.962314,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -8018,8 +8019,8 @@
     ],
     "address": {
       "building": null,
-      "street_number": "266 Alice St",
-      "street_name": null,
+      "street_number": "Shop 1 Maryborough Central Plaza Corner Bazaar & Alice Street",
+      "street_name": "Corner Bazaar & Alice Street",
       "city": "Maryborough",
       "region": null,
       "state": "Queensland",
@@ -8029,8 +8030,8 @@
     "phone": "+61741221099",
     "fax": "+61741235642",
     "email": "maryborough@chemistwarehouse.com.au",
-    "latitude": -25.5421,
-    "longitude": 152.7,
+    "latitude": -25.542091,
+    "longitude": 152.700486,
     "opening_hours": {
       "monday": {
         "from": "08:00",
