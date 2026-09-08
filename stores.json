@@ -8030,8 +8030,8 @@
     "phone": "+61741221099",
     "fax": "+61741235642",
     "email": "maryborough@chemistwarehouse.com.au",
-    "latitude": -25.542091,
-    "longitude": 152.700486,
+    "latitude": -25.542876,
+    "longitude": 152.700242,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -13807,23 +13807,23 @@
     "longitude": 153.036,
     "opening_hours": {
       "monday": {
-        "from": "08:00",
+        "from": "07:00",
         "to": "21:00"
       },
       "tuesday": {
-        "from": "08:00",
+        "from": "07:00",
         "to": "21:00"
       },
       "wednesday": {
-        "from": "08:00",
+        "from": "07:00",
         "to": "21:00"
       },
       "thursday": {
-        "from": "08:00",
+        "from": "07:00",
         "to": "21:00"
       },
       "friday": {
-        "from": "08:00",
+        "from": "07:00",
         "to": "21:00"
       },
       "saturday": {
@@ -32560,13 +32560,34 @@
     "latitude": -27.549839,
     "longitude": 152.939608,
     "opening_hours": {
-      "monday": null,
-      "tuesday": null,
-      "wednesday": null,
-      "thursday": null,
-      "friday": null,
-      "saturday": null,
-      "sunday": null
+      "monday": {
+        "from": "08:00",
+        "to": "17:30"
+      },
+      "tuesday": {
+        "from": "08:00",
+        "to": "17:30"
+      },
+      "wednesday": {
+        "from": "08:00",
+        "to": "17:30"
+      },
+      "thursday": {
+        "from": "08:00",
+        "to": "17:30"
+      },
+      "friday": {
+        "from": "08:00",
+        "to": "17:30"
+      },
+      "saturday": {
+        "from": "08:30",
+        "to": "17:00"
+      },
+      "sunday": {
+        "from": "09:30",
+        "to": "16:00"
+      }
     }
   }
 ]
