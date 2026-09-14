@@ -11406,7 +11406,7 @@
       },
       "thursday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "friday": {
         "from": "08:00",
@@ -21205,7 +21205,8 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery"
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
@@ -24099,10 +24100,8 @@
     "name": "Chemist Warehouse Pimpama City Shopping Centre",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
       "omni-store"
     ],
     "address": {
