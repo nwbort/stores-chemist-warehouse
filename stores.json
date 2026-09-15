@@ -5,6 +5,7 @@
     "name": "Chemist Warehouse Box Hill Central",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
       "fast-delivery",
