@@ -18719,8 +18719,8 @@
     ],
     "address": {
       "building": null,
-      "street_number": "Shop W004A 200 Crown St Mailbox 198",
-      "street_name": null,
+      "street_number": "Shop W004A 200",
+      "street_name": "Crown St",
       "city": "Wollongong",
       "region": null,
       "state": "New South Wales",
@@ -18730,8 +18730,8 @@
     "phone": "+61242294325",
     "fax": "+61242265515",
     "email": "wollongongcentral@chemistwarehouse.com.au",
-    "latitude": -34.4248,
-    "longitude": 150.894,
+    "latitude": -34.424264,
+    "longitude": 150.893286,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -18754,11 +18754,11 @@
         "to": "21:00"
       },
       "saturday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "19:00"
       },
       "sunday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "19:00"
       }
     }
@@ -18777,9 +18777,9 @@
     ],
     "address": {
       "building": null,
-      "street_number": "98 Wellington Street",
+      "street_number": "98 Wellington St,",
       "street_name": null,
-      "city": "Launceston",
+      "city": "South Launceston",
       "region": null,
       "state": "Tasmania",
       "postal_code": "7250",
@@ -18788,8 +18788,8 @@
     "phone": "+61363315424",
     "fax": "+61363001752",
     "email": "southlaunceston@chemistwarehouse.com.au",
-    "latitude": -41.4433,
-    "longitude": 147.138,
+    "latitude": -41.443214,
+    "longitude": 147.138201,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -29835,6 +29835,41 @@
         "from": "09:30",
         "to": "18:00"
       }
+    }
+  },
+  {
+    "key": "cwr-cw-au-store-826",
+    "store_id": 826,
+    "name": "Chemist Warehouse Kidman Park",
+    "type": "store",
+    "capabilities": [
+      "click-and-collect",
+      "cw-au",
+      "fast-delivery"
+    ],
+    "address": {
+      "building": null,
+      "street_number": "Shop 3",
+      "street_name": "376 Grange Road",
+      "city": "Kidman Park",
+      "region": null,
+      "state": "South Australia",
+      "postal_code": "5025",
+      "country": "AU"
+    },
+    "phone": "+61884268441",
+    "fax": "+61861543821",
+    "email": "kidmanpark@chemistwarehouse.com.au",
+    "latitude": -34.906206,
+    "longitude": 138.523102,
+    "opening_hours": {
+      "monday": null,
+      "tuesday": null,
+      "wednesday": null,
+      "thursday": null,
+      "friday": null,
+      "saturday": null,
+      "sunday": null
     }
   },
   {
