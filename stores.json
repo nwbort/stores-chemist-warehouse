@@ -32318,13 +32318,25 @@
         "from": "08:00",
         "to": "20:00"
       },
-      "tuesday": null,
-      "wednesday": null,
-      "thursday": null,
-      "friday": null,
+      "tuesday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "wednesday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "thursday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "friday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
       "saturday": {
         "from": "08:00",
-        "to": null
+        "to": "20:00"
       },
       "sunday": {
         "from": "09:00",
