@@ -3719,7 +3719,7 @@
   {
     "key": "cwr-cw-au-store-102",
     "store_id": 102,
-    "name": "Chemist Warehouse Campsie - Beamish St",
+    "name": "Chemist Warehouse Campsie",
     "type": "store",
     "capabilities": [
       "click-and-collect",
@@ -7696,31 +7696,31 @@
     "opening_hours": {
       "monday": {
         "from": "07:30",
-        "to": "22:00"
+        "to": "21:00"
       },
       "tuesday": {
         "from": "07:30",
-        "to": "22:00"
+        "to": "21:00"
       },
       "wednesday": {
         "from": "07:30",
-        "to": "22:00"
+        "to": "21:00"
       },
       "thursday": {
         "from": "07:30",
-        "to": "22:00"
+        "to": "21:00"
       },
       "friday": {
         "from": "07:30",
-        "to": "22:00"
+        "to": "21:00"
       },
       "saturday": {
         "from": "08:30",
-        "to": "21:00"
+        "to": "20:00"
       },
       "sunday": {
         "from": "08:30",
-        "to": "21:00"
+        "to": "20:00"
       }
     }
   },
@@ -15577,11 +15577,11 @@
       },
       "saturday": {
         "from": "08:30",
-        "to": "21:00"
+        "to": "22:00"
       },
       "sunday": {
         "from": "08:30",
-        "to": "21:00"
+        "to": "22:00"
       }
     }
   },
@@ -27983,10 +27983,8 @@
     "name": "Chemist Warehouse Mildura Central Shopping Centre",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -31592,11 +31590,11 @@
       },
       "saturday": {
         "from": "09:00",
-        "to": "19:00"
+        "to": "20:00"
       },
       "sunday": {
         "from": "09:00",
-        "to": "19:00"
+        "to": "20:00"
       }
     }
   },
