@@ -13111,7 +13111,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "335-341",
+      "street_number": "335 - 341",
       "street_name": "Bridge Rd",
       "city": "Richmond",
       "region": null,
@@ -13119,8 +13119,8 @@
       "postal_code": "3121",
       "country": "AU"
     },
-    "phone": "+61394211010",
-    "fax": "+61394211132",
+    "phone": "094211010",
+    "fax": "094211132",
     "email": "richmond@chemistwarehouse.com.au",
     "latitude": -37.8185852,
     "longitude": 145.0012645,
