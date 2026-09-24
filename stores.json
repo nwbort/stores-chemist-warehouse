@@ -27983,8 +27983,10 @@
     "name": "Chemist Warehouse Mildura Central Shopping Centre",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fast-delivery",
       "omni-store"
     ],
     "address": {
