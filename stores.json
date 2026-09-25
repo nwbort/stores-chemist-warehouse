@@ -30768,8 +30768,8 @@
     "longitude": 115.7185726,
     "opening_hours": {
       "monday": {
-        "from": "08:00",
-        "to": "18:00"
+        "from": "10:00",
+        "to": "17:00"
       },
       "tuesday": {
         "from": "08:00",
