@@ -5585,6 +5585,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store",
       "ub-au"
@@ -13566,6 +13567,7 @@
     "name": "Chemist Warehouse Keilor East",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
       "fallback-omni-store",
@@ -17384,7 +17386,8 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery"
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
@@ -18888,6 +18891,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -20048,6 +20052,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -20510,6 +20515,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -22307,6 +22313,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -25379,6 +25386,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -27813,6 +27821,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -29089,6 +29098,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -29843,9 +29853,7 @@
     "name": "Chemist Warehouse Kidman Park",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
-      "cw-au",
-      "fast-delivery"
+      "cw-au"
     ],
     "address": {
       "building": null,
@@ -30054,6 +30062,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -30768,8 +30777,8 @@
     "longitude": 115.7185726,
     "opening_hours": {
       "monday": {
-        "from": "10:00",
-        "to": "17:00"
+        "from": "08:00",
+        "to": "18:00"
       },
       "tuesday": {
         "from": "08:00",
