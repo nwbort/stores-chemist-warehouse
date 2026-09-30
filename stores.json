@@ -2695,27 +2695,27 @@
     "phone": "+61398784698",
     "fax": "+61398944382",
     "email": "foresthill@chemistwarehouse.com.au",
-    "latitude": -37.8417,
-    "longitude": 145.172,
+    "latitude": -37.841655,
+    "longitude": 145.171949,
     "opening_hours": {
       "monday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "tuesday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "wednesday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "thursday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "friday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "saturday": {
@@ -2723,8 +2723,8 @@
         "to": "18:00"
       },
       "sunday": {
-        "from": "10:00",
-        "to": "17:30"
+        "from": "09:00",
+        "to": "18:00"
       }
     }
   },
@@ -3498,7 +3498,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "Shop 24 & 25",
+      "street_number": "Unit 24 & 25, 428 Old Geelong Rd",
       "street_name": "428 Old Geelong Road",
       "city": "Hoppers Crossing",
       "region": null,
@@ -3509,8 +3509,8 @@
     "phone": "+61399310040",
     "fax": "+61383682705",
     "email": "hopperscrossing@chemistwarehouse.com.au",
-    "latitude": -37.869516,
-    "longitude": 144.734553,
+    "latitude": -37.869613,
+    "longitude": 144.732311,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -29162,7 +29162,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "T11, Big Fish Junction ,",
+      "street_number": "T11 Big Fish Junction, 459 Pumicestone Rd",
       "street_name": "459 Pumicestone Road",
       "city": "Caboolture",
       "region": null,
@@ -29173,8 +29173,8 @@
     "phone": "+61731356257",
     "fax": "+61734452979",
     "email": "caboolture.bigfish@chemistwarehouse.com.au",
-    "latitude": -27.0419958,
-    "longitude": 152.9749804,
+    "latitude": -27.042377,
+    "longitude": 152.974552,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -32305,7 +32305,8 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery"
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
