@@ -2672,63 +2672,6 @@
     }
   },
   {
-    "key": "cwr-cw-au-store-81",
-    "store_id": 81,
-    "name": "Chemist Warehouse Forest Hill",
-    "type": "store",
-    "capabilities": [
-      "click-and-collect",
-      "cw-au",
-      "doordash-marketplace",
-      "fast-delivery"
-    ],
-    "address": {
-      "building": null,
-      "street_number": "415 Springvale Rd",
-      "street_name": null,
-      "city": "Forest Hill",
-      "region": null,
-      "state": "Victoria",
-      "postal_code": "3131",
-      "country": "AU"
-    },
-    "phone": "+61398784698",
-    "fax": "+61398944382",
-    "email": "foresthill@chemistwarehouse.com.au",
-    "latitude": -37.841655,
-    "longitude": 145.171949,
-    "opening_hours": {
-      "monday": {
-        "from": "08:30",
-        "to": "21:00"
-      },
-      "tuesday": {
-        "from": "08:30",
-        "to": "21:00"
-      },
-      "wednesday": {
-        "from": "08:30",
-        "to": "21:00"
-      },
-      "thursday": {
-        "from": "08:30",
-        "to": "21:00"
-      },
-      "friday": {
-        "from": "08:30",
-        "to": "21:00"
-      },
-      "saturday": {
-        "from": "09:00",
-        "to": "18:00"
-      },
-      "sunday": {
-        "from": "09:00",
-        "to": "18:00"
-      }
-    }
-  },
-  {
     "key": "cwr-cw-au-store-82",
     "store_id": 82,
     "name": "Chemist Warehouse Box Hill - Sky Square",
@@ -24114,8 +24057,8 @@
     ],
     "address": {
       "building": null,
-      "street_number": "Shop T10 Pimpama City Shopping Centre 102 Pimpama Jacobs Well Rd",
-      "street_name": null,
+      "street_number": "Shop C10B, Pimpama City Shopping Centre",
+      "street_name": "102 Pimpama Jacobs Well Road",
       "city": "Pimpama",
       "region": null,
       "state": "Queensland",
@@ -24125,8 +24068,8 @@
     "phone": "+61731356221",
     "fax": "+61755155619",
     "email": "pimpamacitysc@chemistwarehouse.com.au",
-    "latitude": -27.8152,
-    "longitude": 153.292,
+    "latitude": -27.81292,
+    "longitude": 153.292773,
     "opening_hours": {
       "monday": {
         "from": "07:30",
