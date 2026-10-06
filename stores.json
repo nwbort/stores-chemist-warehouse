@@ -24051,8 +24051,10 @@
     "name": "Chemist Warehouse Pimpama City Shopping Centre",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fast-delivery",
       "omni-store"
     ],
     "address": {
