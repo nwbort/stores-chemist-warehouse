@@ -23008,10 +23008,8 @@
     "name": "Chemist Warehouse Nowra",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
       "omni-store"
     ],
     "address": {
