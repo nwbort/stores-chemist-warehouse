@@ -23241,7 +23241,6 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -31784,7 +31783,7 @@
   {
     "key": "cwr-cw-au-store-900",
     "store_id": 900,
-    "name": "Chemist Warehouse Lilydale- Maroondah Highway",
+    "name": "Chemist Warehouse Lilydale - Maroondah Highway",
     "type": "store",
     "capabilities": [
       "click-and-collect",
