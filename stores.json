@@ -3876,7 +3876,7 @@
       },
       "thursday": {
         "from": "07:00",
-        "to": "20:00"
+        "to": "21:00"
       },
       "friday": {
         "from": "07:00",
@@ -26799,28 +26799,28 @@
     "longitude": 116.011,
     "opening_hours": {
       "monday": {
-        "from": "08:30",
+        "from": "08:00",
         "to": "20:00"
       },
       "tuesday": {
-        "from": "08:30",
+        "from": "08:00",
         "to": "20:00"
       },
       "wednesday": {
-        "from": "08:30",
+        "from": "08:00",
         "to": "20:00"
       },
       "thursday": {
-        "from": "08:30",
+        "from": "08:00",
         "to": "20:00"
       },
       "friday": {
-        "from": "08:30",
+        "from": "08:00",
         "to": "20:00"
       },
       "saturday": {
-        "from": "08:30",
-        "to": "17:00"
+        "from": "08:00",
+        "to": "18:00"
       },
       "sunday": {
         "from": "09:00",
