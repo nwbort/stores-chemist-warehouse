@@ -29796,13 +29796,15 @@
     "name": "Chemist Warehouse Kidman Park",
     "type": "store",
     "capabilities": [
-      "cw-au"
+      "click-and-collect",
+      "cw-au",
+      "fast-delivery"
     ],
     "address": {
       "building": null,
-      "street_number": "Shop 3",
+      "street_number": "Shops 1 – 4, 376 Grange Road",
       "street_name": "376 Grange Road",
-      "city": "Kidman Park",
+      "city": "KIdman Park",
       "region": null,
       "state": "South Australia",
       "postal_code": "5025",
@@ -29811,16 +29813,37 @@
     "phone": "+61884268441",
     "fax": "+61861543821",
     "email": "kidmanpark@chemistwarehouse.com.au",
-    "latitude": -34.906206,
-    "longitude": 138.523102,
+    "latitude": -34.906211,
+    "longitude": 138.523022,
     "opening_hours": {
-      "monday": null,
-      "tuesday": null,
-      "wednesday": null,
-      "thursday": null,
-      "friday": null,
-      "saturday": null,
-      "sunday": null
+      "monday": {
+        "from": "08:30",
+        "to": "19:00"
+      },
+      "tuesday": {
+        "from": "08:30",
+        "to": "19:00"
+      },
+      "wednesday": {
+        "from": "08:30",
+        "to": "19:00"
+      },
+      "thursday": {
+        "from": "08:30",
+        "to": "19:00"
+      },
+      "friday": {
+        "from": "08:30",
+        "to": "19:00"
+      },
+      "saturday": {
+        "from": "08:30",
+        "to": "17:00"
+      },
+      "sunday": {
+        "from": "10:30",
+        "to": "17:00"
+      }
     }
   },
   {
