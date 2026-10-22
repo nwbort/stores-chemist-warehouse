@@ -32660,5 +32660,47 @@
         "to": "16:00"
       }
     }
+  },
+  {
+    "key": "cwr-cw-au-store-900001",
+    "store_id": 900001,
+    "name": "Test Deployment Store 06/04/2025",
+    "type": "store",
+    "capabilities": [
+      "cw-au"
+    ],
+    "address": {
+      "building": null,
+      "street_number": "Test",
+      "street_name": "Test",
+      "city": "Test",
+      "region": null,
+      "state": "Victoria",
+      "postal_code": "Test",
+      "country": "AU"
+    },
+    "phone": "+6120033698541",
+    "fax": "+6120033698541",
+    "email": "test123@gmail.com",
+    "latitude": -37.819101,
+    "longitude": 145.122099,
+    "opening_hours": {
+      "monday": {
+        "from": "06:45",
+        "to": "18:45"
+      },
+      "tuesday": {
+        "from": "06:45",
+        "to": "18:45"
+      },
+      "wednesday": {
+        "from": "06:45",
+        "to": "18:45"
+      },
+      "thursday": null,
+      "friday": null,
+      "saturday": null,
+      "sunday": null
+    }
   }
 ]
