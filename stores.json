@@ -2672,6 +2672,63 @@
     }
   },
   {
+    "key": "cwr-cw-au-store-81",
+    "store_id": 81,
+    "name": "Chemist Warehouse Forest Hill",
+    "type": "store",
+    "capabilities": [
+      "click-and-collect",
+      "cw-au",
+      "doordash-marketplace",
+      "fast-delivery"
+    ],
+    "address": {
+      "building": null,
+      "street_number": "415 Springvale Rd",
+      "street_name": null,
+      "city": "Forest Hill",
+      "region": null,
+      "state": "Victoria",
+      "postal_code": "3131",
+      "country": "AU"
+    },
+    "phone": "+61398784698",
+    "fax": "+61398944382",
+    "email": "foresthill@chemistwarehouse.com.au",
+    "latitude": -37.8417,
+    "longitude": 145.172,
+    "opening_hours": {
+      "monday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "tuesday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "wednesday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "thursday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "friday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "saturday": {
+        "from": "09:00",
+        "to": "18:00"
+      },
+      "sunday": {
+        "from": "10:00",
+        "to": "17:30"
+      }
+    }
+  },
+  {
     "key": "cwr-cw-au-store-82",
     "store_id": 82,
     "name": "Chemist Warehouse Box Hill - Sky Square",
