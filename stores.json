@@ -23743,11 +23743,11 @@
       },
       "saturday": {
         "from": "08:30",
-        "to": "19:00"
+        "to": "19:30"
       },
       "sunday": {
         "from": "09:00",
-        "to": "19:00"
+        "to": "19:30"
       }
     }
   },
@@ -32724,9 +32724,7 @@
     "name": "Chemist Warehouse Lakeside Joondalup",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
-      "cw-au",
-      "fast-delivery"
+      "cw-au"
     ],
     "address": {
       "building": null,
