@@ -32797,21 +32797,33 @@
     "longitude": 145.122099,
     "opening_hours": {
       "monday": {
-        "from": "06:45",
-        "to": "06:45"
+        "from": "00:00",
+        "to": "00:00"
       },
       "tuesday": {
-        "from": "06:45",
-        "to": "18:45"
+        "from": "10:00",
+        "to": "18:00"
       },
       "wednesday": {
-        "from": "06:45",
-        "to": "18:45"
+        "from": "10:00",
+        "to": "18:00"
       },
-      "thursday": null,
-      "friday": null,
-      "saturday": null,
-      "sunday": null
+      "thursday": {
+        "from": "10:00",
+        "to": "18:00"
+      },
+      "friday": {
+        "from": "10:00",
+        "to": "18:00"
+      },
+      "saturday": {
+        "from": "10:00",
+        "to": "19:00"
+      },
+      "sunday": {
+        "from": "10:00",
+        "to": "19:00"
+      }
     }
   }
 ]
