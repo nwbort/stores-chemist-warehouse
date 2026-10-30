@@ -25601,11 +25601,11 @@
       },
       "saturday": {
         "from": "07:00",
-        "to": "19:00"
+        "to": "20:00"
       },
       "sunday": {
         "from": "07:00",
-        "to": "19:00"
+        "to": "20:00"
       }
     }
   },
@@ -32503,6 +32503,7 @@
       "click-and-collect",
       "cw-au",
       "fast-delivery",
+      "omni-store",
       "ub-au"
     ],
     "address": {
@@ -32547,7 +32548,7 @@
       },
       "sunday": {
         "from": "09:00",
-        "to": "17:00"
+        "to": "18:00"
       }
     }
   },
@@ -32736,7 +32737,7 @@
       "postal_code": "6027",
       "country": "AU"
     },
-    "phone": "+61862723215",
+    "phone": "+61 8 6272 3212",
     "fax": "+61862723215",
     "email": "lakesidejoondalup@chemistwarehouse.com.au",
     "latitude": -31.743596,
