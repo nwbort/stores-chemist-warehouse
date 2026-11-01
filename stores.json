@@ -2684,7 +2684,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "415 Springvale Rd",
+      "street_number": "415 - 417 Springvale Road",
       "street_name": null,
       "city": "Forest Hill",
       "region": null,
@@ -2695,27 +2695,27 @@
     "phone": "+61398784698",
     "fax": "+61398944382",
     "email": "foresthill@chemistwarehouse.com.au",
-    "latitude": -37.8417,
-    "longitude": 145.172,
+    "latitude": -37.841643,
+    "longitude": 145.171906,
     "opening_hours": {
       "monday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "tuesday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "wednesday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "thursday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "friday": {
-        "from": "08:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "saturday": {
@@ -2723,8 +2723,8 @@
         "to": "18:00"
       },
       "sunday": {
-        "from": "10:00",
-        "to": "17:30"
+        "from": "09:00",
+        "to": "18:00"
       }
     }
   },
@@ -12591,7 +12591,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "Shop 3 & 4, 212-220 Greenvale Drive",
+      "street_number": "Shops 3 & 4, 212-220 Greenvale Drive",
       "street_name": null,
       "city": "Greenvale",
       "region": null,
