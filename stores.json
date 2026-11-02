@@ -26950,13 +26950,11 @@
     "capabilities": [
       "click-and-collect",
       "cw-au",
-      "doordash-marketplace",
-      "fast-delivery",
-      "omni-store"
+      "fast-delivery"
     ],
     "address": {
       "building": null,
-      "street_number": "65 Pier Street",
+      "street_number": "68-70 Pier Street",
       "street_name": null,
       "city": "Altona",
       "region": null,
@@ -26965,10 +26963,10 @@
       "country": "AU"
     },
     "phone": "+61385271742",
-    "fax": "+61393988233",
+    "fax": "+61394920978",
     "email": "altona.pierst@chemistwarehouse.com.au",
-    "latitude": -37.8682,
-    "longitude": 144.83,
+    "latitude": -37.868235,
+    "longitude": 144.830633,
     "opening_hours": {
       "monday": {
         "from": "08:30",
@@ -32270,6 +32268,7 @@
       "click-and-collect",
       "cw-au",
       "fast-delivery",
+      "omni-store",
       "ub-au"
     ],
     "address": {
@@ -32725,7 +32724,9 @@
     "name": "Chemist Warehouse Lakeside Joondalup",
     "type": "store",
     "capabilities": [
-      "cw-au"
+      "click-and-collect",
+      "cw-au",
+      "fast-delivery"
     ],
     "address": {
       "building": null,
@@ -32737,7 +32738,7 @@
       "postal_code": "6027",
       "country": "AU"
     },
-    "phone": "+61 8 6272 3212",
+    "phone": "+61862723215",
     "fax": "+61862723215",
     "email": "lakesidejoondalup@chemistwarehouse.com.au",
     "latitude": -31.743596,
