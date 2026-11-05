@@ -32724,9 +32724,7 @@
     "name": "Chemist Warehouse Lakeside Joondalup",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
-      "cw-au",
-      "fast-delivery"
+      "cw-au"
     ],
     "address": {
       "building": null,
