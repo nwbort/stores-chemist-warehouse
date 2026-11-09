@@ -11047,27 +11047,27 @@
     "longitude": 151.274,
     "opening_hours": {
       "monday": {
-        "from": "09:00",
+        "from": "08:00",
         "to": "20:00"
       },
       "tuesday": {
-        "from": "09:00",
+        "from": "08:00",
         "to": "20:00"
       },
       "wednesday": {
-        "from": "09:00",
+        "from": "08:00",
         "to": "20:00"
       },
       "thursday": {
-        "from": "09:00",
+        "from": "08:00",
         "to": "20:00"
       },
       "friday": {
-        "from": "09:00",
+        "from": "08:00",
         "to": "20:00"
       },
       "saturday": {
-        "from": "09:00",
+        "from": "08:00",
         "to": "20:00"
       },
       "sunday": {
@@ -32724,7 +32724,9 @@
     "name": "Chemist Warehouse Lakeside Joondalup",
     "type": "store",
     "capabilities": [
-      "cw-au"
+      "click-and-collect",
+      "cw-au",
+      "fast-delivery"
     ],
     "address": {
       "building": null,
