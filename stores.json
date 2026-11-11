@@ -10910,10 +10910,8 @@
     "name": "Chemist Warehouse Browns Plains",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -16231,10 +16229,8 @@
     "name": "Chemist Warehouse Crestmead",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -26451,15 +26447,15 @@
     "opening_hours": {
       "monday": {
         "from": "08:30",
-        "to": "19:00"
+        "to": "20:00"
       },
       "tuesday": {
         "from": "08:30",
-        "to": "19:00"
+        "to": "20:00"
       },
       "wednesday": {
         "from": "08:30",
-        "to": "19:00"
+        "to": "20:00"
       },
       "thursday": {
         "from": "08:30",
@@ -26467,15 +26463,15 @@
       },
       "friday": {
         "from": "08:30",
-        "to": "19:00"
+        "to": "20:00"
       },
       "saturday": {
         "from": "09:00",
-        "to": "17:00"
+        "to": "18:00"
       },
       "sunday": {
         "from": "10:00",
-        "to": "17:00"
+        "to": "18:00"
       }
     }
   },
@@ -29151,10 +29147,8 @@
     "name": "Chemist Warehouse Caboolture - Big Fish Junction",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -29856,7 +29850,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "Shops 1 – 4, 376 Grange Road",
+      "street_number": "Shops 1 - 4, 376 Grange Road",
       "street_name": "376 Grange Road",
       "city": "KIdman Park",
       "region": null,
