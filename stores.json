@@ -10910,8 +10910,10 @@
     "name": "Chemist Warehouse Browns Plains",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -16229,8 +16231,10 @@
     "name": "Chemist Warehouse Crestmead",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -29147,8 +29151,10 @@
     "name": "Chemist Warehouse Caboolture - Big Fish Junction",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fast-delivery",
       "omni-store"
     ],
     "address": {
@@ -32774,7 +32780,11 @@
     "name": "Test Deployment Store 06/04/2025",
     "type": "store",
     "capabilities": [
-      "cw-au"
+      "click-and-collect",
+      "cw-au",
+      "fallback-omni-store",
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
