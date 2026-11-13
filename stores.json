@@ -17386,8 +17386,7 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fast-delivery",
-      "omni-store"
+      "fast-delivery"
     ],
     "address": {
       "building": null,
@@ -23065,14 +23064,16 @@
     "name": "Chemist Warehouse Nowra",
     "type": "store",
     "capabilities": [
+      "click-and-collect",
       "cw-au",
       "doordash-marketplace",
+      "fast-delivery",
       "omni-store"
     ],
     "address": {
       "building": null,
-      "street_number": "5 Nowra Lane",
-      "street_name": null,
+      "street_number": "8",
+      "street_name": "Jane Street",
       "city": "Nowra",
       "region": null,
       "state": "New South Wales",
@@ -23082,32 +23083,32 @@
     "phone": "+61283814525",
     "fax": "+61244212466",
     "email": "nowra@chemistwarehouse.com.au",
-    "latitude": -34.8747,
-    "longitude": 150.601,
+    "latitude": -34.876427,
+    "longitude": 150.604757,
     "opening_hours": {
       "monday": {
-        "from": "08:30",
-        "to": "18:00"
+        "from": "08:00",
+        "to": "20:00"
       },
       "tuesday": {
-        "from": "08:30",
-        "to": "18:00"
+        "from": "08:00",
+        "to": "20:00"
       },
       "wednesday": {
-        "from": "08:30",
-        "to": "18:00"
+        "from": "08:00",
+        "to": "20:00"
       },
       "thursday": {
-        "from": "08:30",
-        "to": "18:00"
+        "from": "08:00",
+        "to": "20:00"
       },
       "friday": {
-        "from": "08:30",
-        "to": "18:00"
+        "from": "08:00",
+        "to": "20:00"
       },
       "saturday": {
-        "from": "09:00",
-        "to": "17:00"
+        "from": "08:00",
+        "to": "18:00"
       },
       "sunday": {
         "from": "09:00",
@@ -26950,7 +26951,8 @@
     "capabilities": [
       "click-and-collect",
       "cw-au",
-      "fast-delivery"
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
@@ -31694,7 +31696,8 @@
     "capabilities": [
       "click-and-collect",
       "cw-au",
-      "fast-delivery"
+      "fast-delivery",
+      "omni-store"
     ],
     "address": {
       "building": null,
@@ -31714,23 +31717,23 @@
     "opening_hours": {
       "monday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "tuesday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "wednesday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "thursday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "friday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "saturday": {
         "from": "09:00",
@@ -32738,7 +32741,7 @@
       "postal_code": "6027",
       "country": "AU"
     },
-    "phone": "+61862723215",
+    "phone": "+61862723212",
     "fax": "+61862723215",
     "email": "lakesidejoondalup@chemistwarehouse.com.au",
     "latitude": -31.743596,
