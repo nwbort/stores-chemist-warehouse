@@ -7924,8 +7924,8 @@
     "phone": "+61732846454",
     "fax": "+61738893467",
     "email": "redcliffe@chemistwarehouse.com.au",
-    "latitude": -27.226,
-    "longitude": 153.115,
+    "latitude": -27.226019,
+    "longitude": 153.114536,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -23651,7 +23651,7 @@
     ],
     "address": {
       "building": null,
-      "street_number": "Tenancy 3  14 to 20 Elizabeth Avenue",
+      "street_number": "Tenancy 3, 14 to 20 Elizabeth Avenue",
       "street_name": null,
       "city": "Clontarf",
       "region": null,
@@ -23662,8 +23662,8 @@
     "phone": "+61731356231",
     "fax": "+61734489029",
     "email": "clontarf@chemistwarehouse.com.au",
-    "latitude": -27.2597,
-    "longitude": 153.081,
+    "latitude": -27.259654,
+    "longitude": 153.080886,
     "opening_hours": {
       "monday": {
         "from": "08:00",
@@ -32774,6 +32774,60 @@
       "sunday": {
         "from": "11:00",
         "to": "17:00"
+      }
+    }
+  },
+  {
+    "key": "cwr-cw-au-store-973",
+    "store_id": 973,
+    "name": "Chemist Warehouse Beveridge",
+    "type": "store",
+    "capabilities": [
+      "cw-au"
+    ],
+    "address": {
+      "building": null,
+      "street_number": "Ground floor, 1/115 Camerons Lane",
+      "street_name": null,
+      "city": "Beveridge",
+      "region": null,
+      "state": "Victoria",
+      "postal_code": "3753",
+      "country": "AU"
+    },
+    "phone": "+61383977262",
+    "fax": "+61383977261",
+    "email": "beveridge@chemistwarehouse.com.au",
+    "latitude": -37.467101,
+    "longitude": 144.950298,
+    "opening_hours": {
+      "monday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "tuesday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "wednesday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "thursday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "friday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "saturday": {
+        "from": "09:00",
+        "to": "20:00"
+      },
+      "sunday": {
+        "from": "09:00",
+        "to": "20:00"
       }
     }
   },
