@@ -26683,24 +26683,24 @@
     "longitude": 150.9766815,
     "opening_hours": {
       "monday": {
-        "from": "09:00",
-        "to": "17:30"
+        "from": "08:30",
+        "to": "18:00"
       },
       "tuesday": {
-        "from": "09:00",
-        "to": "17:30"
+        "from": "08:30",
+        "to": "18:00"
       },
       "wednesday": {
-        "from": "09:00",
-        "to": "17:30"
+        "from": "08:30",
+        "to": "18:00"
       },
       "thursday": {
-        "from": "09:00",
+        "from": "08:30",
         "to": "21:00"
       },
       "friday": {
-        "from": "09:00",
-        "to": "17:30"
+        "from": "08:30",
+        "to": "18:00"
       },
       "saturday": {
         "from": "09:00",
@@ -32783,7 +32783,9 @@
     "name": "Chemist Warehouse Beveridge",
     "type": "store",
     "capabilities": [
-      "cw-au"
+      "click-and-collect",
+      "cw-au",
+      "fast-delivery"
     ],
     "address": {
       "building": null,
