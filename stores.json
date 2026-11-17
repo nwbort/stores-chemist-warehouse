@@ -32839,11 +32839,7 @@
     "name": "Test Deployment Store 06/04/2025",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
-      "cw-au",
-      "fallback-omni-store",
-      "fast-delivery",
-      "omni-store"
+      "cw-au"
     ],
     "address": {
       "building": null,
@@ -32866,7 +32862,7 @@
         "to": "00:00"
       },
       "tuesday": {
-        "from": "10:00",
+        "from": "07:00",
         "to": "18:00"
       },
       "wednesday": {
