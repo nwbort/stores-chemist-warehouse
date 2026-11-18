@@ -32504,6 +32504,7 @@
     "capabilities": [
       "click-and-collect",
       "cw-au",
+      "fallback-omni-store",
       "fast-delivery",
       "omni-store",
       "ub-au"
