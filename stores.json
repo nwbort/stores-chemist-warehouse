@@ -32779,6 +32779,39 @@
     }
   },
   {
+    "key": "cwr-cw-au-store-961",
+    "store_id": 961,
+    "name": "Chemist Warehouse Mt Druitt",
+    "type": "store",
+    "capabilities": [
+      "cw-au"
+    ],
+    "address": {
+      "building": null,
+      "street_number": "Tenancies T01-T03, Mt Druitt Central",
+      "street_name": "10 Zoe Place",
+      "city": "Mt Druitt",
+      "region": null,
+      "state": "New South Wales",
+      "postal_code": "2770",
+      "country": "AU"
+    },
+    "phone": "+61291989236",
+    "fax": "+61291989239",
+    "email": "mtdruitt@chemistwarehouse.com.au",
+    "latitude": -33.766532,
+    "longitude": 150.827622,
+    "opening_hours": {
+      "monday": null,
+      "tuesday": null,
+      "wednesday": null,
+      "thursday": null,
+      "friday": null,
+      "saturday": null,
+      "sunday": null
+    }
+  },
+  {
     "key": "cwr-cw-au-store-973",
     "store_id": 973,
     "name": "Chemist Warehouse Beveridge",
