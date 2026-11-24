@@ -16289,10 +16289,8 @@
     "name": "Chemist Warehouse Brighton",
     "type": "store",
     "capabilities": [
-      "click-and-collect",
       "cw-au",
-      "doordash-marketplace",
-      "fast-delivery"
+      "doordash-marketplace"
     ],
     "address": {
       "building": null,
@@ -32831,8 +32829,8 @@
       "postal_code": "3753",
       "country": "AU"
     },
-    "phone": "+61383977262",
-    "fax": "+61383977261",
+    "phone": "(03) 8397 7262",
+    "fax": "(03) 8397 7261",
     "email": "beveridge@chemistwarehouse.com.au",
     "latitude": -37.467101,
     "longitude": 144.950298,
