@@ -1149,15 +1149,15 @@
       },
       "friday": {
         "from": "08:00",
-        "to": "21:00"
+        "to": "22:00"
       },
       "saturday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       },
       "sunday": {
         "from": "08:00",
-        "to": "18:00"
+        "to": "19:00"
       }
     }
   },
@@ -3143,7 +3143,6 @@
       "click-and-collect",
       "cw-au",
       "doordash-marketplace",
-      "fallback-omni-store",
       "fast-delivery",
       "omni-store"
     ],
@@ -31057,6 +31056,60 @@
     }
   },
   {
+    "key": "cwr-cw-au-store-871",
+    "store_id": 871,
+    "name": "Chemist Warehouse Langwarrin Plaza",
+    "type": "store",
+    "capabilities": [
+      "cw-au"
+    ],
+    "address": {
+      "building": null,
+      "street_number": "Shop 10-14 Langwarrin Plaza Shopping Centre",
+      "street_name": "385 Cranbourne-Frankston Road",
+      "city": "Langwarrin",
+      "region": null,
+      "state": "Victoria",
+      "postal_code": "3910",
+      "country": "AU"
+    },
+    "phone": "+61396495611",
+    "fax": "+61396495608",
+    "email": "langwarrinplaza@chemistwarehouse.com.au",
+    "latitude": -38.14177,
+    "longitude": 145.208233,
+    "opening_hours": {
+      "monday": {
+        "from": "08:30",
+        "to": "21:00"
+      },
+      "tuesday": {
+        "from": "08:30",
+        "to": "21:00"
+      },
+      "wednesday": {
+        "from": "08:30",
+        "to": "21:00"
+      },
+      "thursday": {
+        "from": "08:30",
+        "to": "21:00"
+      },
+      "friday": {
+        "from": "08:30",
+        "to": "21:00"
+      },
+      "saturday": {
+        "from": "09:00",
+        "to": "18:00"
+      },
+      "sunday": {
+        "from": "09:00",
+        "to": "18:00"
+      }
+    }
+  },
+  {
     "key": "cwr-cw-au-store-875",
     "store_id": 875,
     "name": "Chemist Warehouse Toorak Village",
@@ -32800,13 +32853,34 @@
     "latitude": -33.766532,
     "longitude": 150.827622,
     "opening_hours": {
-      "monday": null,
-      "tuesday": null,
-      "wednesday": null,
-      "thursday": null,
-      "friday": null,
-      "saturday": null,
-      "sunday": null
+      "monday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "tuesday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "wednesday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "thursday": {
+        "from": "08:00",
+        "to": "21:00"
+      },
+      "friday": {
+        "from": "08:00",
+        "to": "20:00"
+      },
+      "saturday": {
+        "from": "09:00",
+        "to": "18:00"
+      },
+      "sunday": {
+        "from": "09:00",
+        "to": "18:00"
+      }
     }
   },
   {
