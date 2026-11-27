@@ -31061,7 +31061,9 @@
     "name": "Chemist Warehouse Langwarrin Plaza",
     "type": "store",
     "capabilities": [
-      "cw-au"
+      "click-and-collect",
+      "cw-au",
+      "fast-delivery"
     ],
     "address": {
       "building": null,
